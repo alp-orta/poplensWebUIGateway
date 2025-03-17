@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using poplensUserAuthenticationApi.Models.Dtos;
@@ -28,6 +29,20 @@ namespace poplensWebUIGateway.Controllers {
         public async Task<IActionResult> Login([FromBody] LoginInfo user) {
             var response = await _httpClient.PostAsync($"{_authApiUrl}/Login",
                 new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json"));
+
+            var content = await response.Content.ReadAsStringAsync();
+            return StatusCode((int)response.StatusCode, content);
+        }
+
+        [HttpGet("FetchIdsFromUsername/{username}")]
+        public async Task<IActionResult> FetchIdsFromUsername(string username) {
+            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            if (string.IsNullOrEmpty(token)) {
+                return Unauthorized(new { Message = "Authorization token is missing" });
+            }
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await _httpClient.GetAsync($"{_authApiUrl}/FetchIdsFromUsername/{username}");
 
             var content = await response.Content.ReadAsStringAsync();
             return StatusCode((int)response.StatusCode, content);

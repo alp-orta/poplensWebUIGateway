@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Net.Http.Headers;
+using poplensWebUIGateway.Helper;
 
 namespace poplensWebUIGateway.Controllers {
     [ApiController]
@@ -12,21 +12,43 @@ namespace poplensWebUIGateway.Controllers {
             _httpClient = httpClient;
         }
 
-        [HttpGet("{profileId}")]
+        [HttpGet("GetProfile/{profileId}")]
+        [ServiceFilter(typeof(AuthorizeHttpClientFilter))]
         public async Task<IActionResult> GetProfile(string profileId) {
-            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            if (string.IsNullOrEmpty(token)) {
-                return Unauthorized(new { Message = "Authorization token is missing" });
-            }
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-            var response = await _httpClient.GetAsync($"{_userProfileApiUrl}/{profileId}");
+            var client = HttpContext.Items["AuthorizedHttpClient"] as HttpClient;
+            var response = await client.GetAsync($"{_userProfileApiUrl}/GetProfile/{profileId}");
 
             if (!response.IsSuccessStatusCode) {
                 return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
             }
 
             return Ok(await response.Content.ReadAsStringAsync());
+        }
+
+        [HttpPost("{followerId}/follow/{followingId}")]
+        [ServiceFilter(typeof(AuthorizeHttpClientFilter))]
+        public async Task<IActionResult> Follow(Guid followerId, Guid followingId) {
+            var client = HttpContext.Items["AuthorizedHttpClient"] as HttpClient;
+            var response = await client.PostAsync($"{_userProfileApiUrl}/{followerId}/follow/{followingId}", null);
+
+            if (!response.IsSuccessStatusCode) {
+                return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
+            }
+
+            return Ok(new { Message = "Successfully followed the user" });
+        }
+
+        [HttpDelete("{followerId}/unfollow/{followingId}")]
+        [ServiceFilter(typeof(AuthorizeHttpClientFilter))]
+        public async Task<IActionResult> Unfollow(Guid followerId, Guid followingId) {
+            var client = HttpContext.Items["AuthorizedHttpClient"] as HttpClient;
+            var response = await client.DeleteAsync($"{_userProfileApiUrl}/{followerId}/unfollow/{followingId}");
+
+            if (!response.IsSuccessStatusCode) {
+                return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
+            }
+
+            return Ok(new { Message = "Successfully unfollowed the user" });
         }
     }
 }

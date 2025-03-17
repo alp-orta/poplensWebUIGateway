@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using poplensWebUIGateway.Helper;
 using System.Text;
 
 
@@ -9,7 +10,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 // Add CORS policy
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowFrontend",
@@ -33,6 +33,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 // Add HttpClient for making requests to the User Authentication API
 builder.Services.AddHttpClient();
+builder.Services.AddScoped<AuthorizeHttpClientFilter>();
 
 var app = builder.Build();
 

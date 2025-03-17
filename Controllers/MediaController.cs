@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using poplensWebUIGateway.Helper;
 using System.Net.Http.Headers;
 
 namespace poplensWebUIGateway.Controllers {
@@ -13,22 +14,19 @@ namespace poplensWebUIGateway.Controllers {
         }
 
         [HttpGet("SearchMedia")]
+        [ServiceFilter(typeof(AuthorizeHttpClientFilter))]
         public async Task<IActionResult> SearchMedia(string mediaType, string query) {
-            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            if (string.IsNullOrEmpty(token)) {
-                return Unauthorized(new { Message = "Authorization token is missing" });
-            }
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            var client = HttpContext.Items["AuthorizedHttpClient"] as HttpClient;
 
             var response = new HttpResponseMessage();
             if (mediaType == "media") {
-                response = await _httpClient.GetAsync($"{_mediaApiUrl}/SearchMedia?query={query}");
+                response = await client.GetAsync($"{_mediaApiUrl}/SearchMedia?query={query}");
             } else if (mediaType == "film") {
-                response = await _httpClient.GetAsync($"{_mediaApiUrl}/SearchFilms?query={query}");
+                response = await client.GetAsync($"{_mediaApiUrl}/SearchFilms?query={query}");
             } else if (mediaType == "book") {
-                response = await _httpClient.GetAsync($"{_mediaApiUrl}/SearchBooks?query={query}");
+                response = await client.GetAsync($"{_mediaApiUrl}/SearchBooks?query={query}");
             } else if (mediaType == "game") {
-                response = await _httpClient.GetAsync($"{_mediaApiUrl}/SearchGames?query={query}");
+                response = await client.GetAsync($"{_mediaApiUrl}/SearchGames?query={query}");
             } else {
                 return BadRequest(new { Message = "Invalid media type" });
             }

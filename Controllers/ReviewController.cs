@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using poplensUserProfileApi.Models.Dtos;
+using poplensWebUIGateway.Helper;
 using System.Net.Http.Headers;
 using System.Text;
 
@@ -16,15 +17,12 @@ namespace poplensWebUIGateway.Controllers {
         }
 
         [HttpPost("{profileId}/addReview")]
+        [ServiceFilter(typeof(AuthorizeHttpClientFilter))]
         public async Task<IActionResult> AddReview(Guid profileId, [FromBody] CreateReviewRequest request) {
-            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            if (string.IsNullOrEmpty(token)) {
-                return Unauthorized(new { Message = "Authorization token is missing" });
-            }
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            var client = HttpContext.Items["AuthorizedHttpClient"] as HttpClient;
 
             var jsonContent = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync($"{_reviewApiUrl}/{profileId}/addReview", jsonContent);
+            var response = await client.PostAsync($"{_reviewApiUrl}/{profileId}/addReview", jsonContent);
 
             if (!response.IsSuccessStatusCode) {
                 return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
