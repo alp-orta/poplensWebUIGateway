@@ -1,19 +1,19 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using poplensUserAuthenticationApi.Models.Dtos;
+using System.Net.Http.Headers;
 using System.Text;
 
 namespace poplensWebUIGateway.Controllers {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class UserAuthenticationController : ControllerBase {
         private readonly HttpClient _httpClient;
+        private readonly string _authApiUrl = "https://localhost:7019/api/UserAuthentication";
 
         public UserAuthenticationController(HttpClient httpClient) {
             _httpClient = httpClient;
         }
-
-        private readonly string _authApiUrl = "https://localhost:7019/api/UserAuthentication"; // Change to your authentication API URL
 
         [HttpPost("Register")]
         public async Task<IActionResult> Register([FromBody] RegisterInfo user) {
@@ -31,6 +31,25 @@ namespace poplensWebUIGateway.Controllers {
 
             var content = await response.Content.ReadAsStringAsync();
             return StatusCode((int)response.StatusCode, content);
+        }
+
+        [HttpGet("ProtectedEndpoint")]
+        public async Task<IActionResult> ProtectedEndpoint() {
+            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            if (string.IsNullOrEmpty(token)) {
+                return Unauthorized(new { Message = "Authorization token is missing" });
+            }
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await _httpClient.GetAsync($"{_authApiUrl}/ProtectedData");
+
+            if (!response.IsSuccessStatusCode) {
+                return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
+            }
+
+            return Ok(await response.Content.ReadAsStringAsync());
         }
     }
 }

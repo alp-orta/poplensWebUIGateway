@@ -1,3 +1,8 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -12,6 +17,19 @@ builder.Services.AddCors(options => {
                           .AllowAnyHeader()
                           .AllowAnyMethod());
 });
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options => {
+        options.TokenValidationParameters = new TokenValidationParameters {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = "YourIssuer",  // Define the valid issuer
+            ValidAudience = "YourAudience",  // Define the valid audience
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("moresimplekeyrightherefolkssssssssssssss"))  // Your secret key
+        };
+    });
 
 // Add HttpClient for making requests to the User Authentication API
 builder.Services.AddHttpClient();
@@ -29,7 +47,11 @@ app.UseHttpsRedirection();
 // Enable CORS
 app.UseCors("AllowFrontend");
 
+
+
+app.UseAuthentication();
 app.UseAuthorization();
+
 
 app.MapControllers();
 
