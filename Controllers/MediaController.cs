@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using poplensWebUIGateway.Helper;
-using System.Net.Http.Headers;
 
 namespace poplensWebUIGateway.Controllers {
     [ApiController]

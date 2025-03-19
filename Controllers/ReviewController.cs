@@ -2,7 +2,6 @@
 using Newtonsoft.Json;
 using poplensUserProfileApi.Models.Dtos;
 using poplensWebUIGateway.Helper;
-using System.Net.Http.Headers;
 using System.Text;
 
 namespace poplensWebUIGateway.Controllers {
