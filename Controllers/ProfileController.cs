@@ -6,7 +6,7 @@ namespace poplensWebUIGateway.Controllers {
     [Route("api/[controller]")]
     public class ProfileController : ControllerBase {
         private readonly HttpClient _httpClient;
-        private readonly string _userProfileApiUrl = "https://localhost:7056/api/Profile";
+        private readonly string _userProfileApiUrl = "http://poplensUserProfileApi:8080/api/Profile";
 
         public ProfileController(HttpClient httpClient) {
             _httpClient = httpClient;

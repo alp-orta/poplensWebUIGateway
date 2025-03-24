@@ -9,7 +9,7 @@ namespace poplensWebUIGateway.Controllers {
     [Route("api/[controller]")]
     public class ReviewController : ControllerBase {
         private readonly HttpClient _httpClient;
-        private readonly string _reviewApiUrl = "https://localhost:7056/api/Review";
+        private readonly string _reviewApiUrl = "http://poplensUserProfileApi:8080/api/Review";
 
         public ReviewController(HttpClient httpClient) {
             _httpClient = httpClient;

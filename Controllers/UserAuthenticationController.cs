@@ -3,13 +3,14 @@ using Newtonsoft.Json;
 using poplensUserAuthenticationApi.Models.Dtos;
 using System.Net.Http.Headers;
 using System.Text;
+using static System.Net.WebRequestMethods;
 
 namespace poplensWebUIGateway.Controllers {
     [ApiController]
     [Route("api/[controller]")]
     public class UserAuthenticationController : ControllerBase {
         private readonly HttpClient _httpClient;
-        private readonly string _authApiUrl = "https://localhost:7019/api/UserAuthentication";
+        private readonly string _authApiUrl = "http://poplensUserAuthenticationApi:8080/api/UserAuthentication";
 
         public UserAuthenticationController(HttpClient httpClient) {
             _httpClient = httpClient;
@@ -64,6 +65,17 @@ namespace poplensWebUIGateway.Controllers {
             }
 
             return Ok(await response.Content.ReadAsStringAsync());
+        }
+
+        [HttpGet("health")]
+        public IActionResult Health() {
+            var response = _httpClient.GetAsync($"{_authApiUrl}/health").Result;
+
+            if (!response.IsSuccessStatusCode) {
+                return StatusCode((int)response.StatusCode, response.Content.ReadAsStringAsync().Result);
+            }
+
+            return Ok(response.Content.ReadAsStringAsync().Result);
         }
     }
 }

@@ -8,7 +8,7 @@ namespace poplensWebUIGateway.Controllers {
     [ApiController]
     [Route("api/[controller]")]
     public class FeedController : ControllerBase {
-        private readonly string _feedApiUrl = "https://localhost:7067/api/Feed";
+        private readonly string _feedApiUrl = "http://poplensFeedApi:8080/api/Feed";
 
         public FeedController() { }
 

@@ -6,7 +6,7 @@ namespace poplensWebUIGateway.Controllers {
     [Route("api/[controller]")]
     public class MediaController : ControllerBase {
         private readonly HttpClient _httpClient;
-        private readonly string _mediaApiUrl = "https://localhost:7207/api/Media";
+        private readonly string _mediaApiUrl = "http://poplensMediaApi:8080/api/Media";
 
         public MediaController(HttpClient httpClient) {
             _httpClient = httpClient;
