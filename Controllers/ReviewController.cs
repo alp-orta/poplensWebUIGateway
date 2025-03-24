@@ -15,7 +15,7 @@ namespace poplensWebUIGateway.Controllers {
             _httpClient = httpClient;
         }
 
-        [HttpPost("{profileId}/addReview")]
+        [HttpPost("{profileId}/AddReview")]
         [ServiceFilter(typeof(AuthorizeHttpClientFilter))]
         public async Task<IActionResult> AddReview(Guid profileId, [FromBody] CreateReviewRequest request) {
             var client = HttpContext.Items["AuthorizedHttpClient"] as HttpClient;
@@ -33,5 +33,21 @@ namespace poplensWebUIGateway.Controllers {
 
         }
 
+        [HttpDelete("{profileId}/DeleteReview/{mediaId}")]
+        [ServiceFilter(typeof(AuthorizeHttpClientFilter))]
+        public async Task<IActionResult> DeleteReview(Guid profileId, string mediaId) {
+            var client = HttpContext.Items["AuthorizedHttpClient"] as HttpClient;
+
+            var response = await client.DeleteAsync($"{_reviewApiUrl}/{profileId}/DeleteReview/{mediaId}");
+
+            if (!response.IsSuccessStatusCode) {
+                if (response.StatusCode == System.Net.HttpStatusCode.NotFound) {
+                    return NotFound();
+                }
+                return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
+            }
+
+            return NoContent();
+        }
     }
 }

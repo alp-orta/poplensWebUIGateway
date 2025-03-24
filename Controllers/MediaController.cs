@@ -37,5 +37,25 @@ namespace poplensWebUIGateway.Controllers {
             return Ok(await response.Content.ReadAsStringAsync());
         }
 
+        [HttpGet("GetMediaWithFilters")]
+        [ServiceFilter(typeof(AuthorizeHttpClientFilter))]
+        public async Task<IActionResult> GetMediaWithFilters(
+            [FromQuery] string mediaType,
+            [FromQuery] string? decade,
+            [FromQuery] string? genre,
+            [FromQuery] string? sortBy,
+            [FromQuery] string? query,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10) {
+
+            var client = HttpContext.Items["AuthorizedHttpClient"] as HttpClient;
+            var response = await client.GetAsync($"{_mediaApiUrl}/GetMediaWithFilters?mediaType={mediaType}&decade={decade}&genre={genre}&sortBy={sortBy}&query={query}&page={page}&pageSize={pageSize}");
+
+            if (!response.IsSuccessStatusCode) {
+                return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
+            }
+
+            return Ok(await response.Content.ReadAsStringAsync());
+        }
     }
 }
