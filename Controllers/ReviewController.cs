@@ -2,6 +2,8 @@
 using Newtonsoft.Json;
 using poplensUserProfileApi.Models.Dtos;
 using poplensWebUIGateway.Helper;
+using poplensWebUIGateway.Models.Common;
+using poplensWebUIGateway.Models.Profile;
 using System.Text;
 
 namespace poplensWebUIGateway.Controllers {
@@ -48,6 +50,36 @@ namespace poplensWebUIGateway.Controllers {
             }
 
             return NoContent();
+        }
+
+        [HttpGet("GetMediaMainPageReviewInfo/{mediaId}")]
+        [ServiceFilter(typeof(AuthorizeHttpClientFilter))]
+        public async Task<IActionResult> GetMediaMainPageReviewInfo(string mediaId) {
+            var client = HttpContext.Items["AuthorizedHttpClient"] as HttpClient;
+
+            var response = await client.GetAsync($"{_reviewApiUrl}/GetMediaMainPageReviewInfo/{mediaId}");
+
+            if (!response.IsSuccessStatusCode) {
+                return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
+            }
+
+            var mediaMainPageReviewInfo = JsonConvert.DeserializeObject<MediaMainPageReviewInfo>(await response.Content.ReadAsStringAsync());
+            return Ok(mediaMainPageReviewInfo);
+        }
+
+        [HttpGet("GetMediaReviews/{mediaId}")]
+        [ServiceFilter(typeof(AuthorizeHttpClientFilter))]
+        public async Task<IActionResult> GetMediaReviews(string mediaId, int page = 1, int pageSize = 10, string sortOption = "mostrecent") {
+            var client = HttpContext.Items["AuthorizedHttpClient"] as HttpClient;
+
+            var response = await client.GetAsync($"{_reviewApiUrl}/GetMediaReviews/{mediaId}?page={page}&pageSize={pageSize}&sortOption={sortOption}");
+
+            if (!response.IsSuccessStatusCode) {
+                return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
+            }
+
+            var reviews = JsonConvert.DeserializeObject<PageResult<ReviewWithUsername>>(await response.Content.ReadAsStringAsync());
+            return Ok(reviews);
         }
     }
 }

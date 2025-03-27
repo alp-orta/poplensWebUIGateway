@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using poplensFeedApi.Models;
-using poplensFeedApi.Models.Common;
 using poplensWebUIGateway.Helper;
+using poplensWebUIGateway.Models.Common;
 
 namespace poplensWebUIGateway.Controllers {
     [ApiController]

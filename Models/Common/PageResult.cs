@@ -1,4 +1,4 @@
-﻿namespace poplensFeedApi.Models.Common {
+﻿namespace poplensWebUIGateway.Models.Common {
     public class PageResult<T> {
         public int Page { get; set; }
         public int PageSize { get; set; }
