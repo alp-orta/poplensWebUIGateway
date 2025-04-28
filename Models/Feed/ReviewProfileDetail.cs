@@ -1,4 +1,4 @@
-﻿using poplensUserProfileApi.Models;
+﻿using poplensWebUIGateway.Models.Profile;
 
 namespace poplensFeedApi.Models {
     public class ReviewProfileDetail : ReviewDetail {

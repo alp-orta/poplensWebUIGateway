@@ -1,4 +1,4 @@
-﻿namespace poplensUserProfileApi.Models {
+﻿namespace poplensWebUIGateway.Models.Profile {
     public class ReviewDetail {
         public Guid Id { get; set; }
         public string Content { get; set; }
