@@ -236,7 +236,7 @@ namespace poplensWebUIGateway.Controllers {
                 return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
             }
 
-            var comments = JsonConvert.DeserializeObject<List<Comment>>(await response.Content.ReadAsStringAsync());
+            var comments = JsonConvert.DeserializeObject<List<CommentDetail>>(await response.Content.ReadAsStringAsync());
             return Ok(comments);
         }
 
@@ -251,7 +251,7 @@ namespace poplensWebUIGateway.Controllers {
                 return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
             }
 
-            var replies = JsonConvert.DeserializeObject<List<Comment>>(await response.Content.ReadAsStringAsync());
+            var replies = JsonConvert.DeserializeObject<List<CommentDetail>>(await response.Content.ReadAsStringAsync());
             return Ok(replies);
         }
 
