@@ -1,4 +1,7 @@
-﻿namespace poplensWebUIGateway.Models.Profile {
+﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace poplensWebUIGateway.Models.Profile {
     public class Comment {
         public Guid Id { get; set; }
         public Guid ReviewId { get; set; } // FK to the Review table
@@ -9,7 +12,9 @@
         public DateTime LastUpdatedDate { get; set; } = DateTime.UtcNow;
 
         // Navigation properties
-        public Comment ParentComment { get; set; }
         public ICollection<Comment> Replies { get; set; } = new List<Comment>();
+
+        [JsonProperty("replyCount")]
+        public int ReplyCount { get; set; }
     }
 }

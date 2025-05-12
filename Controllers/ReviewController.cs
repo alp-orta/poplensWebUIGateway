@@ -270,5 +270,20 @@ namespace poplensWebUIGateway.Controllers {
             return Ok(count);
         }
 
+        [HttpGet("{parentCommentId}/ReplyCount")]
+        [ServiceFilter(typeof(AuthorizeHttpClientFilter))]
+        public async Task<IActionResult> GetReplyCount(Guid parentCommentId) {
+            var client = HttpContext.Items["AuthorizedHttpClient"] as HttpClient;
+
+            var response = await client.GetAsync($"{_reviewApiUrl}/{parentCommentId}/ReplyCount");
+
+            if (!response.IsSuccessStatusCode) {
+                return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
+            }
+
+            var count = JsonConvert.DeserializeObject<int>(await response.Content.ReadAsStringAsync());
+            return Ok(count);
+        }
+
     }
 }
