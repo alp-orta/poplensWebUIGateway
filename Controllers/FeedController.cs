@@ -36,5 +36,31 @@ namespace poplensWebUIGateway.Controllers {
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [HttpGet("GetForYouFeed/{profileId}")]
+        [ServiceFilter(typeof(AuthorizeHttpClientFilter))] // Apply the filter to inject HttpClient
+        public async Task<ActionResult<PageResult<ReviewProfileDetail>>> GetForYouFeed(string profileId, int pageSize = 10) {
+            try {
+                // Get the authorized HttpClient from the HttpContext.Items set by the filter
+                var client = HttpContext.Items["AuthorizedHttpClient"] as HttpClient;
+
+                // Make the request to the Feed API using the HttpClient
+                var response = await client.GetAsync($"{_feedApiUrl}/GetForYouFeed/{profileId}?pageSize={pageSize}");
+
+                // Check if the response is successful, else return the status code and error
+                if (!response.IsSuccessStatusCode) {
+                    return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
+                }
+
+                // Deserialize the response to PageResult
+                var recommendations = JsonConvert.DeserializeObject<PageResult<ReviewProfileDetail>>(await response.Content.ReadAsStringAsync());
+
+                // Return the recommendations
+                return Ok(recommendations);
+            } catch (Exception ex) {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
     }
 }
