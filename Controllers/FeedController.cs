@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using poplensFeedApi.Models;
 using poplensWebUIGateway.Helper;
 using poplensWebUIGateway.Models.Common;
+using poplensWebUIGateway.Models.Media;
 
 namespace poplensWebUIGateway.Controllers {
     [ApiController]
@@ -56,6 +57,33 @@ namespace poplensWebUIGateway.Controllers {
                 var recommendations = JsonConvert.DeserializeObject<PageResult<ReviewProfileDetail>>(await response.Content.ReadAsStringAsync());
 
                 // Return the recommendations
+                return Ok(recommendations);
+            } catch (Exception ex) {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("GetMediaRecommendations/{profileId}")]
+        [ServiceFilter(typeof(AuthorizeHttpClientFilter))]
+        public async Task<ActionResult<List<Media>>> GetMediaRecommendations(
+                string profileId,
+                int pageSize = 3,
+                string? mediaType = null) {
+            try {
+                var client = HttpContext.Items["AuthorizedHttpClient"] as HttpClient;
+
+                // Build query string
+                var url = $"{_feedApiUrl}/GetMediaRecommendations/{profileId}?pageSize={pageSize}";
+                if (!string.IsNullOrEmpty(mediaType))
+                    url += $"&mediaType={Uri.EscapeDataString(mediaType)}";
+
+                var response = await client.GetAsync(url);
+
+                if (!response.IsSuccessStatusCode) {
+                    return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
+                }
+
+                var recommendations = JsonConvert.DeserializeObject<List<Media>>(await response.Content.ReadAsStringAsync());
                 return Ok(recommendations);
             } catch (Exception ex) {
                 return BadRequest(new { message = ex.Message });
